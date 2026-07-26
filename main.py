@@ -41,8 +41,11 @@ def name_chat(name: str) -> str:
     print("SYS: Renaming chat...")
     global chat_name
 
+    if not os.path.isdir("chat/"):
+        os.mkdir("chat/")
+
     try:
-        os.rename(chat_name, name+".txt")
+        os.rename("chat/"+chat_name, "chat/"+name+".txt")
         chat_name = name+".txt"
         return "Chat renamed successfully."
     except Exception as e:
