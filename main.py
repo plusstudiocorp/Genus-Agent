@@ -1,20 +1,25 @@
 #---------
-# Gemini
+# Genus
 #---------
 
 # Libraries
 from google import genai
 from google.genai import types
 from tools import file_tools as ft, web_tool as wt, bash_tool as bt
-import os, json
+import os, json, base64, shlex
 
 # Load variables from the .env file into the environment
 from dotenv import load_dotenv
 load_dotenv() 
 
+# Initializing
+if not os.path.isdir("chat/"): # Makes chat folder is doesn't exists
+    os.mkdir("chat/")
+
 # Variables
 chat_name = "new_chat.json"
 history = None
+model = "gemini-3.1-flash-lite"
 
 # System Prompt
 sys_inst = f"""# GENERAL
@@ -38,25 +43,41 @@ Current working directory:
 
 # Tools    
 def name_chat(name: str) -> str:
-    print("SYS: Renaming chat...")
     global chat_name
+    print("SYS: Renaming chat...")
 
-    if not os.path.isdir("chat/"):
-        os.mkdir("chat/")
+    if not os.path.isfile("chat/"+chat_name):
+        with open("chat/"+chat_name,"w") as f:
+            f.write("[]")
 
     try:
-        os.rename("chat/"+chat_name, "chat/"+name+".txt")
-        chat_name = name+".txt"
+        os.rename("chat/"+chat_name, "chat/"+name+".json")
+        chat_name = name+".json"
         return "Chat renamed successfully."
     except Exception as e:
+        print(e)
         return f"Error: {e}"
-    
+
+def sanitize_history(data):
+    """Strip any thought_signature field that isn't valid base64 so
+    old/corrupted saves can still be loaded instead of crashing."""
+    for item in data:
+        for part in item.get("parts", []) or []:
+            if isinstance(part, dict) and "thought_signature" in part:
+                sig = part["thought_signature"]
+                try:
+                    if isinstance(sig, str):
+                        base64.b64decode(sig, validate=True)
+                except Exception:
+                    del part["thought_signature"]
+    return data
+
 # Gemini Client
 client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
 
-def start_chat(model="gemini-3.1-flash-lite", history=None):
+def start_chat(model=model, history=None):
     kwargs = {
         "model": model,
         "config": types.GenerateContentConfig(
@@ -92,6 +113,13 @@ chat = start_chat()
 # Initializing Code
 models = client.models.list()
 
+def json_converter(obj):
+    """Bytes fields (like thought_signature) must be base64-encoded,
+    not decoded as UTF-8 text, or the data gets corrupted on save."""
+    if isinstance(obj, bytes):
+        return base64.b64encode(obj).decode("ascii")
+    return str(obj)
+
 # Chat Loop
 if __name__ == "__main__":
     try:
@@ -100,9 +128,14 @@ if __name__ == "__main__":
 
             if user[0] == "/":
                 # Detect Command
-                command = user.split()
+                try:
+                    command = shlex.split(user)
+                except ValueError:
+                    print("SYS: Unmatched quote in command.")
+                    continue
                 op = (command[0])[1:]
                 args = command[1:]
+                args_str = " ".join(args)
 
                 # Commands
                 if op.lower() == "model": # Change model
@@ -113,14 +146,27 @@ if __name__ == "__main__":
                             if "models/"+args[0] == i.name:
                                 found = True
                                 print(f"SYS: Changing to {args[0]}!")
+                                model = args[0]
                                 chat = start_chat(args[0], history=history)
                                 break
 
                         if not found:
                             print("SYS: Model not in your API!")
                 
-                continue
+                if op.lower() == "chat": # Load Chat
+                    user_chat = "chat/" + args_str + ".json"
+                    if os.path.isfile(user_chat):
+                        print("SYS: Changing to", args_str)
 
+                        with open(user_chat,"r") as f:
+                            history = sanitize_history(json.load(f))
+                        chat = start_chat(model, history=history)
+                        chat_name = args_str + ".json"
+                    else:
+                        print(f"SYS: Chat {args_str} doesn't exists!")
+                
+                continue
+                    
             if not user.strip():
                 continue
 
@@ -128,14 +174,9 @@ if __name__ == "__main__":
 
             print(response.text)
 
-            def json_converter(obj):
-                if isinstance(obj, bytes):
-                    return obj.decode("utf-8", errors="replace")
-                return str(obj)
-
             history = [item.model_dump() for item in chat.get_history()]
 
-            with open(chat_name, "w", encoding="utf-8") as f:
+            with open("chat/"+chat_name, "w", encoding="utf-8") as f:
                 json.dump(
                     history,
                     f,
