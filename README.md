@@ -4,6 +4,9 @@
 
 Genus-Agent is a sophisticated, AI-driven programming assistant designed to integrate directly with your local development environment. By leveraging powerful GenAI APIs, Genus-Agent gains the capability to autonomously analyze, read, and modify files within your codebase, streamlining your development workflow.
 
+## ⚠️ Development Status Warning
+**Note:** The current branch and recent MCP (Model Context Protocol) tool integration are currently experimental. They are not fully stable and may require manual debugging or configuration fixes to function as expected.
+
 ## Key Features
 
 - **Autonomous File Management**: Seamlessly read and edit files across your local projects using integrated toolsets.
@@ -16,6 +19,7 @@ Genus-Agent is a sophisticated, AI-driven programming assistant designed to inte
 
 - Python 3.x
 - An active Gemini API key from [Google AI Studio](https://aistudio.google.com/)
+- Node.js (required for MCP tools via `npx`)
 
 ## Installation
 
@@ -47,7 +51,7 @@ Once active, you can provide instructions, ask for code generation, or request f
 
 ## Project Structure
 
-- `main.py`: The entry point for the agent, containing the chat loop and Gemini client configuration.
+- `main.py`: The entry point for the agent, containing the chat loop, Gemini client configuration, and experimental MCP tool orchestration.
 - `tools/`: A collection of modular tools for file system interaction, web searching, and terminal management.
 - `requirements.txt`: List of necessary Python libraries.
 
