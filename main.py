@@ -186,7 +186,7 @@ if __name__ == "__main__":
             last_chunk = None
             print("Thinking...")
             response = chat.send_message(user)
-            print(response.text)
+            print(f"✦ -> {response.text}")
 
             """
             response = chat.send_message_stream(user)

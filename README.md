@@ -12,6 +12,9 @@ Genus-Agent is a sophisticated, AI-driven programming assistant designed to inte
 - **Task Automation**: Capable of handling repetitive coding tasks, documentation generation, and boilerplate creation through terminal and file system access.
 - **Extensible Architecture**: Built with modular tools, allowing for easy expansion and customization of agent capabilities.
 
+> [!NOTE]
+> A router internet is required to run genus smoothly, a mobile connection will slow the response.
+
 ## Prerequisites
 
 - Python 3.x
