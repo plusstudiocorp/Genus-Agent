@@ -5,12 +5,13 @@
 # Libraries
 from google import genai
 from google.genai import types
-from tools import file_tools as ft, web_tool as wt, bash_tool as bt
+from tools import file_tools as ft, web_tool as wt, bash_tool as bt, image_tool as imgt
 import os, json, base64, shlex
 
 # Load variables from the .env file into the environment
 from dotenv import load_dotenv
-load_dotenv() 
+load_dotenv()
+print("Loding API Key...") 
 
 # Initializing
 if not os.path.isdir("chat/"): # Makes chat folder is doesn't exists
@@ -19,7 +20,8 @@ if not os.path.isdir("chat/"): # Makes chat folder is doesn't exists
 # Variables
 chat_name = "new_chat.json"
 history = None
-model = "gemini-3.5-flash-lite"
+model = "gemini-3.1-flash-lite"
+DEBUG = True
 
 # System Prompt
 sys_inst = f"""# GENERAL
@@ -77,11 +79,15 @@ client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
 
+print("Getting model ready...")
+imgt.init(client)
+
 def start_chat(model=model, history=None):
     kwargs = {
         "model": model,
         "config": types.GenerateContentConfig(
             system_instruction=sys_inst,
+            thinking_config=types.ThinkingConfig(thinking_budget=0),
             tools=[
                 ft.create_file,
                 ft.create_folder,
@@ -98,6 +104,8 @@ def start_chat(model=model, history=None):
                 bt.read_terminal,
                 bt.list_terminals,
                 bt.close_terminal,
+                imgt.analyze_image,
+                imgt.analyze_image_prompt,
                 name_chat,
             ]
         )
@@ -111,7 +119,7 @@ def start_chat(model=model, history=None):
 chat = start_chat()
 
 # Initializing Code
-models = client.models.list()
+models = None
 
 def json_converter(obj):
     """Bytes fields (like thought_signature) must be base64-encoded,
@@ -121,10 +129,11 @@ def json_converter(obj):
     return str(obj)
 
 # Chat Loop
+print("Genus is ready!")
 if __name__ == "__main__":
     try:
         while True:
-            user = input("> ")
+            user = input("\n> ")
 
             if user[0] == "/":
                 # Detect Command
@@ -140,6 +149,10 @@ if __name__ == "__main__":
                 # Commands
                 if op.lower() == "model": # Change model
                         found = False
+
+                        if models == None:
+                            print("Listing models...")
+                            models = client.models.list()
 
                         for i in models:
                             pass
@@ -170,9 +183,21 @@ if __name__ == "__main__":
             if not user.strip():
                 continue
 
+            last_chunk = None
+            print("Thinking...")
             response = chat.send_message(user)
-
             print(response.text)
+
+            """
+            response = chat.send_message_stream(user)
+            for chunk in response:
+                print(chunk.text or "", end="", flush=True)
+                last_chunk = chunk
+
+            if last_chunk and DEBUG:
+                for part in last_chunk.candidates[0].content.parts:
+                    print(repr(part))
+            """
 
             history = [item.model_dump() for item in chat.get_history()]
 
@@ -184,6 +209,7 @@ if __name__ == "__main__":
                     ensure_ascii=False,
                     default=json_converter
             )
+            print("Checkpoint Saved...")
 
     except KeyboardInterrupt:
         print("\nExiting...")
