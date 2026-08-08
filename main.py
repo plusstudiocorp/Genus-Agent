@@ -19,7 +19,7 @@ if not os.path.isdir("chat/"): # Makes chat folder is doesn't exists
 # Variables
 chat_name = "new_chat.json"
 history = None
-model = "gemini-3.1-flash-lite"
+model = "gemini-3.5-flash-lite"
 
 # System Prompt
 sys_inst = f"""# GENERAL
