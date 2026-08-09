@@ -43,7 +43,7 @@ def read_mem() -> str:
 
 
 def remove_mem(line: int) -> str:
-    """Removes a line from memory."""
+    """Removes a point from memory."""
     print("SYS: Forgetting...")
     memories = _load()
     index = line - 1  # user-facing line numbers are 1-indexed (see read_mem)
@@ -55,7 +55,19 @@ def remove_mem(line: int) -> str:
 
 
 def clear_mem() -> str:
-    """Clears the memory."""
+    """Clears the whole memory. Use it carefully"""
     print("SYS: Resetting...")
     _save([])
     return "All memories cleared successfully!"
+
+def update_mem(line: int, data: str) -> str:
+    """Updates a point and saves it to memory, its a combination of remove and store memory."""
+    print("SYS: Revising...")
+    memories = _load()
+    index = line - 1  # user-facing line numbers are 1-indexed (see read_mem)
+    if index < 0 or index >= len(memories):
+        return f"No memory at line {line}."
+    old = memories[index]
+    memories[index] = data
+    _save(memories)
+    return f"Successfully updated line {line}: '{old}' -> '{data}'"
