@@ -180,7 +180,7 @@ def list_terminals() -> str:
 
 def close_terminal(terminal_id: int) -> str:
     """Forcefully kills and removes a terminal."""
-    print(f"Closing terminal {terminal_id}...")
+    print(f"SYS: Closing terminal {terminal_id}...")
     term = _terminals.pop(int(terminal_id), None)
     if term is None:
         return f"Error: Terminal {terminal_id} does not exist."
