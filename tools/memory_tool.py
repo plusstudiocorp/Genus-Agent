@@ -1,6 +1,6 @@
 import json, os
 
-FILE_PATH = "memory.json"
+FILE_PATH = ".genus/memory.json"
 
 
 def _load() -> list:

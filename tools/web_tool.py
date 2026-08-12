@@ -35,6 +35,9 @@ import requests
 from bs4 import BeautifulSoup
 from ddgs import DDGS
 
+if not os.path.isdir(".genus/search_history"):
+    os.mkdir(".genus/search_history")
+
 
 # ---------------------------------------------------------------------------
 # 1. Raw search - not for the LLM, used internally / by other functions
@@ -55,7 +58,7 @@ def duckduckgo_search(query: str, max_results: int = 5) -> list:
 # ---------------------------------------------------------------------------
 # 2. web_search - for the LLM. Model chooses how many results ("pages").
 # ---------------------------------------------------------------------------
-def web_search(query: str, max_results: int = 5) -> str:
+def web_search(query: str, max_results: int = 20) -> str:
     """Search DuckDuckGo and return compact Markdown for the LLM.
 
     `max_results` is exposed as a normal parameter so the calling model can
@@ -87,7 +90,11 @@ def web_search(query: str, max_results: int = 5) -> str:
 """
         )
 
-    return "\n---\n".join(output)
+    output = "\n---\n".join(output)
+    with open(".genus/search_history/"+query+".md","w",encoding="utf-8") as f:
+        f.write(output)
+
+    return output
 
 
 # ---------------------------------------------------------------------------
@@ -149,7 +156,11 @@ def web_search_url(url: str, timeout: int = 15) -> str:
     text = soup.get_text(separator="\n", strip=True)
     title = soup.title.string.strip() if (soup.title and soup.title.string) else url
 
-    return f"# {title}\n\n**URL:** {url}\n\n{text}"
+    output = f"# {title}\n\n**URL:** {url}\n\n{text}"
+    with open(".genus/search_history/"+url.removeprefix("https://")+".md","w") as f:
+        f.write(output)
+
+    return output
 
 
 # ---------------------------------------------------------------------------

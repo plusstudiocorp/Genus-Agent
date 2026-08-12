@@ -4,10 +4,15 @@
 
 # Libraries
 print("Loading Tools...")
+
+import os, json, base64, shlex, ctypes
+if not os.path.isdir(".genus/"): # Makes genus folder is doesn't exists
+    os.mkdir(".genus/")
+    ctypes.windll.kernel32.SetFileAttributesW(".genus", 2)
+    
 from google import genai
 from google.genai import types
 from tools import file_tools as ft, web_tool as wt, bash_tool as bt, image_tool as imgt, memory_tool as memt
-import os, json, base64, shlex
 
 # Load variables from the .env file into the environment
 print("Initializing and Loding API Key...") 
@@ -15,8 +20,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initializing
-if not os.path.isdir("chat/"): # Makes chat folder is doesn't exists
-    os.mkdir("chat/")
+if not os.path.isdir(".genus/chat/"): # Makes chat folder is doesn't exists
+    os.mkdir(".genus/chat/")
 
 # Variables
 chat_name = "new_chat.json"
@@ -65,12 +70,12 @@ def name_chat(name: str) -> str:
     global chat_name
     print("SYS: Renaming chat...")
 
-    if not os.path.isfile("chat/"+chat_name):
-        with open("chat/"+chat_name,"w") as f:
+    if not os.path.isfile(".genus/chat/"+chat_name):
+        with open(".genus/chat/"+chat_name,"w",encoding="utf-8") as f:
             f.write("[]")
 
     try:
-        os.rename("chat/"+chat_name, "chat/"+name+".json")
+        os.rename(".genus/chat/"+chat_name, ".genus/chat/"+name+".json")
         chat_name = name+".json"
         return "Chat renamed successfully."
     except Exception as e:
@@ -127,6 +132,7 @@ def start_chat(model=model, history=None):
                 memt.store_mem,
                 memt.remove_mem,
                 memt.clear_mem,
+                memt.update_mem,
                 name_chat,
             ]
         )
@@ -189,11 +195,11 @@ if __name__ == "__main__":
                             print("SYS: Model not in your API!")
                 
                 if op.lower() == "chat": # Load Chat
-                    user_chat = "chat/" + args_str + ".json"
+                    user_chat = ".genus/chat/" + args_str + ".json"
                     if os.path.isfile(user_chat):
                         print("SYS: Changing to", args_str)
 
-                        with open(user_chat,"r") as f:
+                        with open(user_chat,"r",encoding="utf-8") as f:
                             history = sanitize_history(json.load(f))
                         chat = start_chat(model, history=history)
                         chat_name = args_str + ".json"
@@ -223,7 +229,7 @@ if __name__ == "__main__":
 
             history = [item.model_dump() for item in chat.get_history()]
 
-            with open("chat/"+chat_name, "w", encoding="utf-8") as f:
+            with open(".genus/chat/"+chat_name, "w", encoding="utf-8") as f:
                 json.dump(
                     history,
                     f,
