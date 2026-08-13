@@ -12,7 +12,7 @@ if not os.path.isdir(".genus/"): # Makes genus folder is doesn't exists
     
 from google import genai
 from google.genai import types
-from tools import file_tools as ft, web_tool as wt, bash_tool as bt, image_tool as imgt, memory_tool as memt
+from tools import file_tools as ft, web_tool as wt, bash_tool as bt, image_tool as imgt, memory_tool as memt, gmail_tool as gmt
 
 # Load variables from the .env file into the environment
 print("Initializing and Loding API Key...") 
@@ -111,6 +111,7 @@ def start_chat(model=model, history=None):
             system_instruction=sys_inst,
             thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             tools=[
+                # File Manager Tools
                 ft.create_file,
                 ft.create_folder,
                 ft.read_file,
@@ -118,21 +119,38 @@ def start_chat(model=model, history=None):
                 ft.move_item,
                 ft.delete_item,
                 ft.list_items,
+
+                # Search Tools
                 wt.web_search,
                 wt.web_search_url,
                 wt.download_web,
+
+                # Terminal Tools
                 bt.create_terminal,
                 bt.input_terminal,
                 bt.read_terminal,
                 bt.list_terminals,
                 bt.close_terminal,
+
+                # Image Tools
                 imgt.analyze_image,
                 imgt.analyze_image_prompt,
+
+                # Memory Tools
                 memt.read_mem,
                 memt.store_mem,
                 memt.remove_mem,
                 memt.clear_mem,
                 memt.update_mem,
+
+                # Prototype Gmail Tools
+                gmt.list_emails_tool,
+                gmt.read_email_tool,
+                gmt.send_email_tool,
+                gmt.mark_as_read_tool,
+                gmt.trash_email_tool,
+
+                # In-Build Tools
                 name_chat,
             ]
         )
