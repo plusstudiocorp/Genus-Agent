@@ -204,6 +204,8 @@ def start_chat(model=model, history=None):
                 # Google Drive Tools
                 drive.list_files_tool,
                 drive.get_file_metadata_tool,
+                drive.create_file_tool,
+                drive.read_file_tool,
                 drive.upload_file_tool,
                 drive.download_file_tool,
                 drive.create_folder_tool,

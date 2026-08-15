@@ -234,6 +234,54 @@ def create_file_tool(name: str, content: str, mime_type: str = "text/plain", par
         f"- **Link:** {result['webViewLink']}"
     )
 
+def read_file(service, file_id: str, max_bytes: int = None) -> str:
+    meta = service.files().get(fileId=file_id, fields="mimeType, name").execute()
+    mime_type = meta["mimeType"]
+
+    export_map = {
+        "application/vnd.google-apps.document": "text/plain",
+        "application/vnd.google-apps.spreadsheet": "text/csv",
+        "application/vnd.google-apps.presentation": "text/plain",
+    }
+
+    if mime_type in export_map:
+        request = service.files().export_media(fileId=file_id, mimeType=export_map[mime_type])
+    else:
+        request = service.files().get_media(fileId=file_id)
+
+    fh = io.BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    done = False
+    while not done:
+        _, done = downloader.next_chunk()
+
+    fh.seek(0)
+    data = fh.read()
+
+    if max_bytes:
+        data = data[:max_bytes]
+
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return f"[Binary file — {len(data)} bytes, mimeType: {mime_type}. Cannot display as text.]"
+
+@_tool("Reading File")
+def read_file_tool(file_id: str, max_chars: int = 5000) -> str:
+    """
+    Read a Drive file's content directly, without downloading it to disk. Works for
+    plain text files (.txt, .csv, .json, .md) and Google Docs/Sheets/Slides (auto-
+    exported as text/CSV). Binary files (images, PDFs, etc.) can't be read this way —
+    use download_file_tool for those instead. max_chars truncates long files.
+    """
+    content = read_file(_service, file_id, max_bytes=max_chars)
+    if len(content) >= max_chars:
+        content += "\n\n*(truncated)*"
+    return (
+        f"### File Content\n"
+        f"```\n{content}\n```"
+    )
+
 @_tool("Uploading File")
 def upload_file_tool(local_path: str, name: str = None, parent_folder_id: str = None) -> str:
     """
