@@ -1,0 +1,15 @@
+[
+    "list_files_tool",
+    "get_file_metadata_tool",
+    "upload_file_tool",
+    "download_file_tool",
+    "create_folder_tool",
+    "move_file_tool",
+    "copy_file_tool",
+    "rename_file_tool",
+    "trash_file_tool",
+    "untrash_file_tool",
+    "permanently_delete_file_tool",
+    "share_file_tool",
+    "list_permissions_tool"
+]

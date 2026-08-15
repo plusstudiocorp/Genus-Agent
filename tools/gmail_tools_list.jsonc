@@ -1,0 +1,53 @@
+[
+    // Messages Tool
+    "list_emails_tool",
+    "read_email_tool",
+    "send_email_tool",
+    "mark_as_read_tool",
+    "mark_as_unread_tool",
+    "apply_labels_tool",
+    "trash_email_tool",
+    "untrash_email_tool",
+    "permanently_delete_email_tool",
+    "batch_apply_labels_tool",
+    "batch_permanently_delete_tool",
+    "download_attachment_tool",
+
+    // Threads Tool
+    "list_threads_tool",
+    "read_thread_tool",
+    "trash_thread_tool",
+    "untrash_thread_tool",
+    "permanently_delete_thread_tool",
+    "apply_thread_labels_tool",
+
+    // Lables Tool
+    "list_labels_too",
+    "create_label_tool",
+    "rename_label_tool",
+    "delete_label_tool",
+    
+    // Drafts Tool
+    "list_drafts_tool",
+    "create_draft_tool",
+    "update_draft_tool",
+    "send_draft_tool",
+    "delete_draft_tool",
+
+    // History Tool
+    "list_history_tool",
+
+    // Profile and Watch Tool
+    "get_profile_tool",
+    "watch_mailbox_tool",
+    "stop_watch_tool",
+
+    // Settings Tool
+    "list_filters_tool",
+    "create_filter_tool",
+    "delete_filter_tool",
+    "get_vacation_settings_tool",
+    "update_vacation_settings_tool",
+    "list_forwarding_addresses_too",
+    "list_send_as_aliases_tool"
+]

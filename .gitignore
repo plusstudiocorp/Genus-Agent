@@ -3,4 +3,6 @@ __pycache__
 chat
 Genus-Agent.code-workspace
 memory.json
+credentials.json
+token.json
 prototype/

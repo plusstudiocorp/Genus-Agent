@@ -12,7 +12,15 @@ if not os.path.isdir(".genus/"): # Makes genus folder is doesn't exists
     
 from google import genai
 from google.genai import types
-from tools import file_tools as ft, web_tool as wt, bash_tool as bt, image_tool as imgt, memory_tool as memt, gmail_tool as gmt
+from tools import (
+    file_tools as ft, 
+    web_tool as wt, 
+    bash_tool as bt, 
+    image_tool as imgt, 
+    memory_tool as memt, 
+    gmail_tool as gmt,
+    drive_tool as drive
+)
 
 # Load variables from the .env file into the environment
 print("Initializing and Loding API Key...") 
@@ -111,6 +119,9 @@ def start_chat(model=model, history=None):
             system_instruction=sys_inst,
             thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             tools=[
+                # In-Build Tools
+                name_chat,
+
                 # File Manager Tools
                 ft.create_file,
                 ft.create_folder,
@@ -144,17 +155,69 @@ def start_chat(model=model, history=None):
                 memt.update_mem,
 
                 # Prototype Gmail Tools
+                # Messages Tool
                 gmt.list_emails_tool,
                 gmt.read_email_tool,
                 gmt.send_email_tool,
                 gmt.mark_as_read_tool,
+                gmt.mark_as_unread_tool,
+                gmt.apply_labels_tool,
                 gmt.trash_email_tool,
+                gmt.untrash_email_tool,
+                # gmt.permanently_delete_email_tool,
+                gmt.batch_apply_labels_tool,
+                # gmt.batch_permanently_delete_tool,
+                gmt.download_attachment_tool,
+                # Threads Tool
+                gmt.list_threads_tool,
+                gmt.read_thread_tool,
+                gmt.trash_thread_tool,
+                gmt.untrash_thread_tool,
+                # gmt.permanently_delete_thread_tool,
+                gmt.apply_thread_labels_tool,
+                # Labels Tool
+                gmt.list_labels_tool,
+                gmt.create_label_tool,
+                gmt.rename_label_tool,
+                gmt.delete_label_tool,
+                # Drafts Tool
+                gmt.list_drafts_tool,
+                gmt.create_draft_tool,
+                gmt.update_draft_tool,
+                gmt.send_draft_tool,
+                gmt.delete_draft_tool,
+                # History Tool
+                gmt.list_history_tool,
+                # Profile and Watch Tool
+                # gmt.get_profile_tool,
+                # gmt.watch_mailbox_tool,
+                # gmt.stop_watch_tool,
+                # Settings Tool
+                # gmt.list_filters_tool,
+                # gmt.create_filter_tool,
+                # gmt.delete_filter_tool,
+                # gmt.get_vacation_settings_tool,
+                # gmt.update_vacation_settings_tool,
+                # gmt.list_forwarding_addresses_tool,
+                # gmt.list_send_as_aliases_tool
 
-                # In-Build Tools
-                name_chat,
-            ]
-        )
-    }
+                # Google Drive Tools
+                drive.list_files_tool,
+                drive.get_file_metadata_tool,
+                drive.upload_file_tool,
+                drive.download_file_tool,
+                drive.create_folder_tool,
+                drive.move_file_tool,
+                drive.copy_file_tool,
+                drive.rename_file_tool,
+                drive.trash_file_tool,
+                drive.untrash_file_tool,
+                # drive.permanently_delete_file_tool,
+                drive.share_file_tool,
+                drive.list_permissions_tool,
+                ]
+            )
+        }
 
     if history is not None:
         kwargs["history"] = history
