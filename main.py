@@ -176,18 +176,18 @@ def start_chat(model=model, history=None):
                 # gmt.permanently_delete_thread_tool,
                 gmt.apply_thread_labels_tool,
                 # Labels Tool
-                gmt.list_labels_tool,
-                gmt.create_label_tool,
-                gmt.rename_label_tool,
-                gmt.delete_label_tool,
+                # gmt.list_labels_tool,
+                # gmt.create_label_tool,
+                # gmt.rename_label_tool,
+                # gmt.delete_label_tool,
                 # Drafts Tool
-                gmt.list_drafts_tool,
-                gmt.create_draft_tool,
-                gmt.update_draft_tool,
-                gmt.send_draft_tool,
-                gmt.delete_draft_tool,
+                # gmt.list_drafts_tool,
+                # gmt.create_draft_tool,
+                # gmt.update_draft_tool,
+                # gmt.send_draft_tool,
+                # gmt.delete_draft_tool,
                 # History Tool
-                gmt.list_history_tool,
+                # gmt.list_history_tool,
                 # Profile and Watch Tool
                 # gmt.get_profile_tool,
                 # gmt.watch_mailbox_tool,

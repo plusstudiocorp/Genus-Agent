@@ -41,7 +41,7 @@ def get_service():
     """Authenticates the user and returns the Gmail API service object."""
     creds = None
     if os.path.exists("gmail_token.json"):
-        creds = Credentials.from_authorized_user_file("gmmail_token.json", SCOPES)
+        creds = Credentials.from_authorized_user_file("gmail_token.json", SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
