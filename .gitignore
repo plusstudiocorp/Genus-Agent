@@ -4,5 +4,6 @@ chat
 Genus-Agent.code-workspace
 memory.json
 credentials.json
-token.json
+gmail_token.json
+drive_token.json
 prototype/

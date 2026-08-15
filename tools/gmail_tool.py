@@ -40,15 +40,15 @@ SCOPES = [
 def get_service():
     """Authenticates the user and returns the Gmail API service object."""
     creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    if os.path.exists("gmail_token.json"):
+        creds = Credentials.from_authorized_user_file("gmmail_token.json", SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as f:
+        with open("gmail_token.json", "w") as f:
             f.write(creds.to_json())
     return build("gmail", "v1", credentials=creds)
 

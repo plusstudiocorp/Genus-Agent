@@ -7,7 +7,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload, MediaIoBaseUpload
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 TOKEN_PATH = "drive_token.json"
@@ -73,6 +73,19 @@ def get_file_metadata(service, file_id: str) -> dict:
     return service.files().get(
         fileId=file_id,
         fields="id, name, mimeType, modifiedTime, size, parents, webViewLink, owners"
+    ).execute()
+
+def create_file(service, name: str, content: str, mime_type: str = "text/plain", parent_folder_id: str = None) -> dict:
+    file_metadata = {"name": name}
+    if parent_folder_id:
+        file_metadata["parents"] = [parent_folder_id]
+
+    media = MediaIoBaseUpload(
+        io.BytesIO(content.encode("utf-8")),
+        mimetype=mime_type
+    )
+    return service.files().create(
+        body=file_metadata, media_body=media, fields="id, name, webViewLink"
     ).execute()
 
 
@@ -205,6 +218,21 @@ def get_file_metadata_tool(file_id: str) -> str:
         f"- **Link:** {meta.get('webViewLink')}"
     )
 
+@_tool("Creating File")
+def create_file_tool(name: str, content: str, mime_type: str = "text/plain", parent_folder_id: str = None) -> str:
+    """
+    Create a new file directly in Drive from text content — no local file or upload
+    needed. Use this for notes, generated reports, CSVs, JSON, code, or any text-based
+    content the model itself is producing. mime_type examples: "text/plain",
+    "text/csv", "text/markdown", "application/json". parent_folder_id is optional —
+    use list_files_tool to find folder IDs.
+    """
+    result = create_file(_service, name, content, mime_type=mime_type, parent_folder_id=parent_folder_id)
+    return (
+        f"**Success:** Created **{result['name']}**\n"
+        f"- **ID:** `{result['id']}`\n"
+        f"- **Link:** {result['webViewLink']}"
+    )
 
 @_tool("Uploading File")
 def upload_file_tool(local_path: str, name: str = None, parent_folder_id: str = None) -> str:
